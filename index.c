@@ -82,18 +82,22 @@ void execute(){
     int lowerBound=currentProcess->memoryBoundaries[0];
 
     word* instruction = Memory[currentProcess->pc+currentProcess->memoryBoundaries[0]+9];
-    printf("Instruction: %s\n", instruction->value);
+    printf("Executing Instruction: %s\n", instruction->value);
     int blocking = whichBlocking(instruction);
-    printf("Blocking: %d\n", blocking);
     if (blocking!=0){
-        if (blocking<0) // semSignal
+        if (blocking<0){ // semSignal{
             mutexes[-blocking-1]=0;
+            PCB* dequeud=dequeueHighestBlockedPriorityOfResource(-blocking-1);  // dequeue the highest priority PCB from the blocked mutexes queue
+            enqueue(dequeud); // enqueue the dequeued PCB to the ready queue
+            dequeueBlocked(dequeud); // dequeue the PCB from the general blocked queue and set its state to ready i.e 0
+        }
         else{ // semWait
-            if (!mutexes[blocking-1])
-                flipMutex(blocking-1);
-            else{
+            if (!mutexes[blocking-1])  // mutex is available
+                flipMutex(blocking-1); // lock the mutex
+            else{ // mutex is not available
                 enqueueBlocked(currentProcess);
                 enqueueBlockedResource(currentProcess, blocking-1);
+                dequeue(currentProcess);
                 currentProcess->state = 1;
             }
         }
@@ -102,8 +106,6 @@ void execute(){
         executeInstruction(currentProcess, instruction);
 
     incrementPC(currentProcess);
-
-
 
 }
 
@@ -164,6 +166,9 @@ int main()
     // int* quantum;
     // printf("highest Unblocked PID: %d\n", getHighestPriorityUnblocked(quantum)->PID);
     // printf("highest PID quantum: %d\n",*quantum);
+    execute();
+    execute();
+    execute();
     execute();
     execute();
     execute();

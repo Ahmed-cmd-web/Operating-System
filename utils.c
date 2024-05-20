@@ -67,6 +67,38 @@ void enqueueBlockedResource(PCB* pcb, int resource){
         i++;
     blockedResources[resource][i] = pcb;
 }
+
+void dequeue(PCB* pcb){
+    for (int i = 0; i < 3; i++)
+        if (queues[pcb->priority][i]->PID == pcb->PID){
+            queues[pcb->priority][i] = NULL;
+            return;
+        }
+}
+
+PCB* dequeueHighestBlockedPriorityOfResource(int resource){
+    int currentPriority = 100;
+    PCB* highestPriorityPCB = (PCB*)malloc(sizeof(PCB));
+    for (int i = 0; i < 3; i++)
+        if (blockedResources[resource][i] != NULL){
+            if (blockedResources[resource][i]->priority < currentPriority){
+                highestPriorityPCB = blockedResources[resource][i];
+                currentPriority = highestPriorityPCB->priority;
+            }
+        }
+    return highestPriorityPCB;
+}
+
+void dequeueBlocked(PCB* pcb){
+    for (int i = 0; i < 3; i++)
+        if (generalBlockedQueue[i]!=NULL  &&  (generalBlockedQueue[i]->PID) == (pcb->PID)){
+            generalBlockedQueue[i] = NULL;
+            pcb->state = 0;
+            return;
+        }
+}
+
+
 void flipMutex(int resource){
     mutexes[resource] = !mutexes[resource];
 }
