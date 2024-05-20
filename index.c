@@ -1,28 +1,177 @@
 #include <stdio.h>
 #include <stdbool.h>
-
-typedef struct {
-    int PID;
-    bool state;  // blocked/unblocked
-    int priority;
-    int pc;
-    int memoryBoundaries[2];   // [startInMemory, endInMemory]
-} PCB;
+#include <string.h>
+#include <stdlib.h>
+#include "utils.c"
+#include "operations.c"
 
 
-char* Memory[57];
-PCB PCBMemory[3];
-PCB generalBlockedQueue[3];  // 3 queues for the 3 resources {Accessing file,Taking user input,Outputting }   True->blocked, False->unblocked
-PCB queues[4][3];  // 4 queues for the 4 priorities
-bool mutexes[3];  // 3 mutexes for the 3 resources {Accessing file,Taking user input,Outputting }   True->blocked, False->unblocked
-PCB blockedResources[3][3];  // 3 queues for the 3 resources {Accessing file,Taking user input,Outputting }
+PCB* read(char* filename){
+    FILE *file = fopen(filename, "r");
+    PCB* newPCB=(PCB*)malloc(sizeof(PCB));
 
-void read;
-void execute;
+    newPCB->PID = currentPID++;
+    Memory[lastMemoryPosition++] = createPCBattr("PID", newPCB->PID);
+
+
+    newPCB->state = 0;
+    Memory[lastMemoryPosition++] = createPCBattr("State", newPCB->state);
+
+    newPCB->priority = 0;
+    Memory[lastMemoryPosition++] = createPCBattr("Priority", newPCB->priority);
+
+
+    newPCB->pc = 0;
+    Memory[lastMemoryPosition++] = createPCBattr("PC", newPCB->pc);
+
+
+    newPCB->memoryBoundaries[0] = lastMemoryPosition-4;
+    Memory[lastMemoryPosition++] = createPCBattr("lowerBound", newPCB->memoryBoundaries[0]);
+
+
+    int previousMemoryPosition = lastMemoryPosition;
+    char line[100];
+    while (fgets(line, 100, file) != NULL){
+        word* newWord = (word*)malloc(sizeof(word));
+        line[strcspn(line, "\r\n")]='\0';
+        newWord->name = "Instruction";
+        newWord->value = strdup(line);
+        Memory[lastMemoryPosition+4] = newWord;
+        lastMemoryPosition++;
+    }
+
+
+    fclose(file);
+    newPCB->memoryBoundaries[1] = lastMemoryPosition+4;
+    Memory[previousMemoryPosition++] = createPCBattr("upperBound", newPCB->memoryBoundaries[1]);
+
+    Memory[previousMemoryPosition++] = NULL;
+    Memory[previousMemoryPosition++] = NULL;
+    Memory[previousMemoryPosition++] = NULL;
+
+
+    lastMemoryPosition++;
+
+    return newPCB;
+}
+
+
+
+PCB* getHighestPriorityUnblocked(int* quantum){
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 3; j++) {
+            PCB* currentPCB = queues[i][j];
+            if (currentPCB != NULL && currentPCB->state == 0) {
+                    *quantum = i+1;
+                    return currentPCB;
+            }
+        }
+    }
+    return NULL;
+}
+
+
+
+
+void execute(){
+    int quantum;
+    PCB* currentProcess=getHighestPriorityUnblocked(&quantum);
+    if (currentProcess==NULL)
+        return;
+
+    int lowerBound=currentProcess->memoryBoundaries[0];
+
+    word* instruction = Memory[currentProcess->pc+currentProcess->memoryBoundaries[0]+9];
+    printf("Instruction: %s\n", instruction->value);
+    int blocking = whichBlocking(instruction);
+    printf("Blocking: %d\n", blocking);
+    if (blocking!=0){
+        if (blocking<0) // semSignal
+            mutexes[-blocking-1]=0;
+        else{ // semWait
+            if (!mutexes[blocking-1])
+                flipMutex(blocking-1);
+            else{
+                enqueueBlocked(currentProcess);
+                enqueueBlockedResource(currentProcess, blocking-1);
+                currentProcess->state = 1;
+            }
+        }
+    }
+    else
+        executeInstruction(currentProcess, instruction);
+
+    incrementPC(currentProcess);
+
+
+
+}
+
 
 int main()
 {
+    int arrivals[3] = {1, 2, 3};
+    // for (int clock = 0; clock < 1e3; clock++)
+    // {
+    //     for (int i = 0; i < 3; i++)
+    //     {
+    //         if (arrivals[i] == clock)
+    //         {
+    //             PCB* process = (PCB*)malloc(sizeof(PCB));
+    //             switch (i)
+    //             {
+    //             case 0:
+    //                 process = read("Program_1.txt");
+    //                 break;
+    //             case 1:
+    //                 process = read("Program_2.txt");
+    //                 break;
+    //             case 2:
+    //                 process = read("Program_3.txt");
+    //                 break;
+    //             default:
+    //                 break;
+    //             }
+    //             enqueue(process);
+    //         }
+    //     }
+    //     execute();
+    // }
 
+
+
+
+    PCB* process=read("Program_1.txt");
+    // printf("PID: %d\n", process->PID);
+
+    enqueue(process);
+
+
+
+    // int i = 0;
+    // while (Memory[i] != NULL)
+    // {
+    //     printMemory(i);
+    //     i++;
+    // }
+
+
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     printQueue(queues[i]);
+    // }
+
+    // int* quantum;
+    // printf("highest Unblocked PID: %d\n", getHighestPriorityUnblocked(quantum)->PID);
+    // printf("highest PID quantum: %d\n",*quantum);
+    execute();
+    execute();
+    execute();
+    for (int i = 0; i < 20; i++)
+        if (Memory[i] != NULL)
+            printMemory(i);
+    printf("pc: %d\n", process->pc);
+    printf("Mutex: %d %d %d\n", mutexes[0],mutexes[1],mutexes[2]);
     return 0;
 }
 
@@ -63,3 +212,12 @@ int main()
         // if the resource is available, execute the instruction and set the mutex respectively
         // if the resource is not available, block the PCB by enqueuing it to the generalBlockedQueue and the respective blockedQueue of the resource
     // finally push the PCB to the next lower quantum
+
+
+
+
+
+
+
+
+//

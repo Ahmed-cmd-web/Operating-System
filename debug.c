@@ -1,14 +1,12 @@
 #include <stdio.h>
 
-
-
+void ad(int a, int b)
+{
+    printf("%d\n", a + b);
+}
 
 int main()
 {
-    int arr[5];
-    arr[0] = 1;
-
-    printf("%d\n", sizeof(arr) / sizeof(arr[0]));
-    /* code */
+    void (*operations[3])(int, int) = {ad};
     return 0;
 }
