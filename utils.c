@@ -4,13 +4,28 @@
 #include <string.h>
 #include <stdlib.h>
 
-
-
+void printMemory(int i){
+    printf("%d- ", i);
+    word *word = Memory[i];
+    printf("name: %s  ", word->name);
+    printf("value:%s \n", word->value);
+}
+void dequeue(PCB* pcb){
+    for (int i = 0; i < 3; i++)
+        if (queues[pcb->priority][i] !=NULL&& queues[pcb->priority][i]->PID == pcb->PID)
+        {
+            queues[pcb->priority][i] = NULL;
+            return;
+        }
+}
 
 int findVariable(PCB* pcb, char* varName){
-    for (int i = pcb->memoryBoundaries[0]; i < pcb->memoryBoundaries[1]; i++)
-        if (Memory[i] !=NULL&& strcmp(Memory[i]->name, varName) == 0)
+    for (int i = pcb->memoryBoundaries[0]; i < pcb->memoryBoundaries[1]; i++){
+        if (Memory[i] != NULL && strcmp(Memory[i]->name, varName) == 0)
             return i;
+        }
+    printf("NOT found variable with name %s\n", varName);
+
 
     for (int i = pcb->memoryBoundaries[0]+6; i < pcb->memoryBoundaries[0]+10; i++)
         if (Memory[i]==NULL)
@@ -30,6 +45,37 @@ int whichResource(char* resource){
 }
 
 
+int removeIfDone(PCB* pcb){
+    if ((pcb->pc+9+pcb->memoryBoundaries[0]) >= pcb->memoryBoundaries[1]){
+        for (int i = pcb->memoryBoundaries[0]; i < pcb->memoryBoundaries[1]; i++)
+            Memory[i] = NULL;
+        for (int i = 0; i < 3; i++)
+            if (queues[pcb->priority][i] != NULL && queues[pcb->priority][i]->PID == pcb->PID){
+                queues[pcb->priority][i] = NULL;
+                return 1;
+            }
+    }
+    return 0;
+}
+
+void enqueue(PCB* pcb){
+    int i = 0;
+    while (queues[pcb->priority][i] != NULL)
+        i++;
+    queues[pcb->priority][i] = pcb;
+}
+
+void degradePriority(PCB* pcb){
+    if (pcb->priority < 3){
+        dequeue(pcb);
+        pcb->priority++;
+        char buf [20];
+        snprintf(buf, 10, "%d", pcb->priority);
+        Memory[findVariable(pcb, "Priority")]->value = strdup(buf);
+        enqueue(pcb);
+    }
+}
+
 int whichBlocking(word* instruction){
     char* operation=strtok(strdup(instruction->value), " ");
     char* resource=strtok(NULL, " ");
@@ -46,15 +92,11 @@ void incrementPC(PCB* pcb){
     pcb->pc++;
     char buf [20];
     snprintf(buf, 10, "%d", pcb->pc);
-    Memory[findVariable(pcb, "PC")]->value = strdup(buf);
+    int loc = findVariable(pcb, "PC");
+    Memory[loc]->value = strdup(buf);
 }
 
-void enqueue(PCB* pcb){
-    int i = 0;
-    while (queues[pcb->priority][i] != NULL)
-        i++;
-    queues[pcb->priority][i] = pcb;
-}
+
 void enqueueBlocked(PCB* pcb){
     int i = 0;
     while (generalBlockedQueue[i] != NULL)
@@ -68,17 +110,11 @@ void enqueueBlockedResource(PCB* pcb, int resource){
     blockedResources[resource][i] = pcb;
 }
 
-void dequeue(PCB* pcb){
-    for (int i = 0; i < 3; i++)
-        if (queues[pcb->priority][i]->PID == pcb->PID){
-            queues[pcb->priority][i] = NULL;
-            return;
-        }
-}
+
 
 PCB* dequeueHighestBlockedPriorityOfResource(int resource){
     int currentPriority = 100;
-    PCB* highestPriorityPCB = (PCB*)malloc(sizeof(PCB));
+    PCB* highestPriorityPCB=NULL;
     for (int i = 0; i < 3; i++)
         if (blockedResources[resource][i] != NULL){
             if (blockedResources[resource][i]->priority < currentPriority){
@@ -127,10 +163,4 @@ word* createPCBattr(char* name, int value){
     snprintf(buf, 10, "%d", value);
     newWord->value = strdup(buf); // Allocate memory for the string and copy the value
     return newWord;
-}
-void printMemory(int i){
-    printf("%d- ", i);
-    word *word = Memory[i];
-    printf("name: %s  ", word->name);
-    printf("value:%s \n", word->value);
 }

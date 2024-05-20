@@ -45,9 +45,10 @@ PCB* read(char* filename){
     newPCB->memoryBoundaries[1] = lastMemoryPosition+4;
     Memory[previousMemoryPosition++] = createPCBattr("upperBound", newPCB->memoryBoundaries[1]);
 
-    Memory[previousMemoryPosition++] = NULL;
-    Memory[previousMemoryPosition++] = NULL;
-    Memory[previousMemoryPosition++] = NULL;
+    // Memory[previousMemoryPosition++] = NULL;
+    // Memory[previousMemoryPosition++] = NULL;
+    // Memory[previousMemoryPosition++] = NULL;
+    lastMemoryPosition+=3;
 
 
     lastMemoryPosition++;
@@ -76,107 +77,117 @@ PCB* getHighestPriorityUnblocked(int* quantum){
 void execute(){
     int quantum;
     PCB* currentProcess=getHighestPriorityUnblocked(&quantum);
+
     if (currentProcess==NULL)
         return;
-
+    printf("Executing Process: %d\n", currentProcess->PID);
     int lowerBound=currentProcess->memoryBoundaries[0];
-
-    word* instruction = Memory[currentProcess->pc+currentProcess->memoryBoundaries[0]+9];
-    printf("Executing Instruction: %s\n", instruction->value);
-    int blocking = whichBlocking(instruction);
-    if (blocking!=0){
-        if (blocking<0){ // semSignal{
-            mutexes[-blocking-1]=0;
-            PCB* dequeud=dequeueHighestBlockedPriorityOfResource(-blocking-1);  // dequeue the highest priority PCB from the blocked mutexes queue
-            enqueue(dequeud); // enqueue the dequeued PCB to the ready queue
-            dequeueBlocked(dequeud); // dequeue the PCB from the general blocked queue and set its state to ready i.e 0
-        }
-        else{ // semWait
-            if (!mutexes[blocking-1])  // mutex is available
-                flipMutex(blocking-1); // lock the mutex
-            else{ // mutex is not available
-                enqueueBlocked(currentProcess);
-                enqueueBlockedResource(currentProcess, blocking-1);
-                dequeue(currentProcess);
-                currentProcess->state = 1;
+    int removed = 0;
+    for (int i = 0; i < quantum; i++)
+    {
+        word *instruction = Memory[currentProcess->pc + currentProcess->memoryBoundaries[0] + 9];
+        printf("Executing Instruction: %s\n", instruction->value);
+        int blocking = whichBlocking(instruction);
+        if (blocking != 0)
+        {
+            if (blocking < 0)
+            { // semSignal
+                mutexes[-blocking - 1] = 0;
+                PCB *dequeud = dequeueHighestBlockedPriorityOfResource(-blocking - 1); // dequeue the highest priority PCB from the blocked mutexes queue
+                if (dequeud != NULL)
+                {
+                    enqueue(dequeud);        // enqueue the dequeued PCB to the ready queue
+                    dequeueBlocked(dequeud); // dequeue the PCB from the general blocked queue and set its state to ready i.e 0
+                }
+            }
+            else
+            {                                // semWait
+                if (!mutexes[blocking - 1])  // mutex is available
+                    flipMutex(blocking - 1); // lock the mutex
+                else
+                { // mutex is not available
+                    enqueueBlocked(currentProcess);
+                    enqueueBlockedResource(currentProcess, blocking - 1);
+                    dequeue(currentProcess);
+                    currentProcess->state = 1;
+                }
             }
         }
-    }
-    else
-        executeInstruction(currentProcess, instruction);
+        else
+            executeInstruction(currentProcess, instruction);
 
-    incrementPC(currentProcess);
+        incrementPC(currentProcess);
+        removed=removeIfDone(currentProcess);
+        if (removed)
+            break;
+    }
+    if (!removed)
+        degradePriority(currentProcess);
+
 
 }
 
 
 int main()
 {
-    int arrivals[3] = {1, 2, 3};
-    // for (int clock = 0; clock < 1e3; clock++)
+
+    int arrivals[3];
+    char *input = malloc(100);
+    printf("Enter arrival time for %s: ","process 1" );
+    scanf("%s", input);
+    arrivals[0] = atoi(input);
+    printf("Enter arrival time for %s: ","process 2" );
+    scanf("%s", input);
+    arrivals[1] = atoi(input);
+    printf("Enter arrival time for %s: ","process 3" );
+    scanf("%s", input);
+    arrivals[2] = atoi(input);
+
+    for (int clock = 0; clock < 1e3; clock++)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if (arrivals[i] == clock)
+            {
+                PCB* process = (PCB*)malloc(sizeof(PCB));
+                switch (i)
+                {
+                case 0:
+                    process = read("Program_1.txt");
+                    break;
+                case 1:
+                    process = read("Program_2.txt");
+                    break;
+                case 2:
+                    process = read("Program_3.txt");
+                    break;
+                default:
+                    break;
+                }
+                enqueue(process);
+            }
+        }
+        execute();
+    }
+
+    // PCB *process = (PCB *)malloc(sizeof(PCB));
+    // process = read("Program_1.txt");
+    // enqueue(process);
+    // process = read("Program_2.txt");
+    // enqueue(process);
+    // process = read("Program_3.txt");
+    // enqueue(process);
+
+
+    // for (int i = 0; i < 60; i++)
     // {
-    //     for (int i = 0; i < 3; i++)
-    //     {
-    //         if (arrivals[i] == clock)
-    //         {
-    //             PCB* process = (PCB*)malloc(sizeof(PCB));
-    //             switch (i)
-    //             {
-    //             case 0:
-    //                 process = read("Program_1.txt");
-    //                 break;
-    //             case 1:
-    //                 process = read("Program_2.txt");
-    //                 break;
-    //             case 2:
-    //                 process = read("Program_3.txt");
-    //                 break;
-    //             default:
-    //                 break;
-    //             }
-    //             enqueue(process);
-    //         }
-    //     }
-    //     execute();
+    //     if (Memory[i] != NULL)
+    //         printMemory(i);
+    //     else
+    //         printf("%d- NULL\n", i);
     // }
 
 
-
-
-    PCB* process=read("Program_1.txt");
-    // printf("PID: %d\n", process->PID);
-
-    enqueue(process);
-
-
-
-    // int i = 0;
-    // while (Memory[i] != NULL)
-    // {
-    //     printMemory(i);
-    //     i++;
-    // }
-
-
-    // for (int i = 0; i < 4; i++)
-    // {
-    //     printQueue(queues[i]);
-    // }
-
-    // int* quantum;
-    // printf("highest Unblocked PID: %d\n", getHighestPriorityUnblocked(quantum)->PID);
-    // printf("highest PID quantum: %d\n",*quantum);
-    execute();
-    execute();
-    execute();
-    execute();
-    execute();
-    execute();
-    for (int i = 0; i < 20; i++)
-        if (Memory[i] != NULL)
-            printMemory(i);
-    printf("pc: %d\n", process->pc);
-    printf("Mutex: %d %d %d\n", mutexes[0],mutexes[1],mutexes[2]);
     return 0;
 }
 
