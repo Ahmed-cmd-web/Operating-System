@@ -2,38 +2,38 @@
 triple:          'arm64-apple-darwin'
 binary-path:     '/Users/ahmedsaid/OS/index'
 relocations:
-  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _printMemory, symObjAddr: 0x0, symBinAddr: 0x100002310, symSize: 0x84 }
-  - { offsetInCU: 0x3F, offset: 0x3F, size: 0x8, addend: 0x0, symName: _currentPID, symObjAddr: 0x49B4, symBinAddr: 0x100008000, symSize: 0x0 }
-  - { offsetInCU: 0x5B, offset: 0x5B, size: 0x8, addend: 0x0, symName: _lastMemoryPosition, symObjAddr: 0x49B8, symBinAddr: 0x100008004, symSize: 0x0 }
-  - { offsetInCU: 0x8A, offset: 0x8A, size: 0x8, addend: 0x0, symName: _Memory, symBinAddr: 0x100008008, symSize: 0x0 }
-  - { offsetInCU: 0xDD, offset: 0xDD, size: 0x8, addend: 0x0, symName: _generalBlockedQueue, symBinAddr: 0x100008230, symSize: 0x0 }
-  - { offsetInCU: 0x162, offset: 0x162, size: 0x8, addend: 0x0, symName: _queues, symBinAddr: 0x100008250, symSize: 0x0 }
-  - { offsetInCU: 0x189, offset: 0x189, size: 0x8, addend: 0x0, symName: _blockedResources, symBinAddr: 0x1000081E8, symSize: 0x0 }
-  - { offsetInCU: 0x1B0, offset: 0x1B0, size: 0x8, addend: 0x0, symName: _mutexes, symBinAddr: 0x100008248, symSize: 0x0 }
-  - { offsetInCU: 0x1C6, offset: 0x1C6, size: 0x8, addend: 0x0, symName: _printMemory, symObjAddr: 0x0, symBinAddr: 0x100002310, symSize: 0x84 }
-  - { offsetInCU: 0x1F8, offset: 0x1F8, size: 0x8, addend: 0x0, symName: _dequeue, symObjAddr: 0x84, symBinAddr: 0x100002394, symSize: 0xAC }
-  - { offsetInCU: 0x238, offset: 0x238, size: 0x8, addend: 0x0, symName: _findVariable, symObjAddr: 0x130, symBinAddr: 0x100002440, symSize: 0x174 }
-  - { offsetInCU: 0x2A6, offset: 0x2A6, size: 0x8, addend: 0x0, symName: _whichResource, symObjAddr: 0x2A4, symBinAddr: 0x1000025B4, symSize: 0xB4 }
-  - { offsetInCU: 0x2CE, offset: 0x2CE, size: 0x8, addend: 0x0, symName: _removeIfDone, symObjAddr: 0x358, symBinAddr: 0x100002668, symSize: 0x158 }
-  - { offsetInCU: 0x32A, offset: 0x32A, size: 0x8, addend: 0x0, symName: _enqueue, symObjAddr: 0x4B0, symBinAddr: 0x1000027C0, symSize: 0x84 }
-  - { offsetInCU: 0x35C, offset: 0x35C, size: 0x8, addend: 0x0, symName: _degradePriority, symObjAddr: 0x534, symBinAddr: 0x100002844, symSize: 0xF4 }
-  - { offsetInCU: 0x39C, offset: 0x39C, size: 0x8, addend: 0x0, symName: _whichBlocking, symObjAddr: 0x628, symBinAddr: 0x100002938, symSize: 0xC4 }
-  - { offsetInCU: 0x3E0, offset: 0x3E0, size: 0x8, addend: 0x0, symName: _incrementPC, symObjAddr: 0x6EC, symBinAddr: 0x1000029FC, symSize: 0xC8 }
-  - { offsetInCU: 0x420, offset: 0x420, size: 0x8, addend: 0x0, symName: _enqueueBlocked, symObjAddr: 0x7B4, symBinAddr: 0x100002AC4, symSize: 0x5C }
-  - { offsetInCU: 0x452, offset: 0x452, size: 0x8, addend: 0x0, symName: _enqueueBlockedResource, symObjAddr: 0x810, symBinAddr: 0x100002B20, symSize: 0x80 }
-  - { offsetInCU: 0x492, offset: 0x492, size: 0x8, addend: 0x0, symName: _dequeueHighestBlockedPriorityOfResource, symObjAddr: 0x890, symBinAddr: 0x100002BA0, symSize: 0xEC }
-  - { offsetInCU: 0x4F2, offset: 0x4F2, size: 0x8, addend: 0x0, symName: _dequeueBlocked, symObjAddr: 0x97C, symBinAddr: 0x100002C8C, symSize: 0xAC }
-  - { offsetInCU: 0x532, offset: 0x532, size: 0x8, addend: 0x0, symName: _flipMutex, symObjAddr: 0xA28, symBinAddr: 0x100002D38, symSize: 0x3C }
-  - { offsetInCU: 0x556, offset: 0x556, size: 0x8, addend: 0x0, symName: _printQueue, symObjAddr: 0xA64, symBinAddr: 0x100002D74, symSize: 0xD4 }
-  - { offsetInCU: 0x596, offset: 0x596, size: 0x8, addend: 0x0, symName: _createPCBattr, symObjAddr: 0xB38, symBinAddr: 0x100002E48, symSize: 0xE0 }
-  - { offsetInCU: 0x5E8, offset: 0x5E8, size: 0x8, addend: 0x0, symName: _readFile, symObjAddr: 0xC18, symBinAddr: 0x100002F28, symSize: 0xBC }
-  - { offsetInCU: 0x63A, offset: 0x63A, size: 0x8, addend: 0x0, symName: _assign, symObjAddr: 0xCD4, symBinAddr: 0x100002FE4, symSize: 0x1CC }
-  - { offsetInCU: 0x714, offset: 0x714, size: 0x8, addend: 0x0, symName: _print, symObjAddr: 0xEA0, symBinAddr: 0x1000031B0, symSize: 0xBC }
-  - { offsetInCU: 0x770, offset: 0x770, size: 0x8, addend: 0x0, symName: _writeFile, symObjAddr: 0xF5C, symBinAddr: 0x10000326C, symSize: 0xDC }
-  - { offsetInCU: 0x7DA, offset: 0x7DA, size: 0x8, addend: 0x0, symName: _printFromTo, symObjAddr: 0x1038, symBinAddr: 0x100003348, symSize: 0x188 }
-  - { offsetInCU: 0x86E, offset: 0x86E, size: 0x8, addend: 0x0, symName: _executeInstruction, symObjAddr: 0x11C0, symBinAddr: 0x1000034D0, symSize: 0x108 }
-  - { offsetInCU: 0x8AE, offset: 0x8AE, size: 0x8, addend: 0x0, symName: _read, symObjAddr: 0x12C8, symBinAddr: 0x1000035D8, symSize: 0x300 }
-  - { offsetInCU: 0x92D, offset: 0x92D, size: 0x8, addend: 0x0, symName: _getHighestPriorityUnblocked, symObjAddr: 0x15C8, symBinAddr: 0x1000038D8, symSize: 0xE8 }
-  - { offsetInCU: 0x9A9, offset: 0x9A9, size: 0x8, addend: 0x0, symName: _execute, symObjAddr: 0x16B0, symBinAddr: 0x1000039C0, symSize: 0x1F0 }
-  - { offsetInCU: 0xA21, offset: 0xA21, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x18A0, symBinAddr: 0x100003BB0, symSize: 0x94 }
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _printMemory, symObjAddr: 0x0, symBinAddr: 0x100001C5C, symSize: 0x84 }
+  - { offsetInCU: 0x3F, offset: 0x3F, size: 0x8, addend: 0x0, symName: _currentPID, symObjAddr: 0x5758, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0x5B, offset: 0x5B, size: 0x8, addend: 0x0, symName: _lastMemoryPosition, symObjAddr: 0x575C, symBinAddr: 0x100008004, symSize: 0x0 }
+  - { offsetInCU: 0x7E, offset: 0x7E, size: 0x8, addend: 0x0, symName: _Memory, symBinAddr: 0x100008008, symSize: 0x0 }
+  - { offsetInCU: 0xD1, offset: 0xD1, size: 0x8, addend: 0x0, symName: _generalBlockedQueue, symBinAddr: 0x100008230, symSize: 0x0 }
+  - { offsetInCU: 0x156, offset: 0x156, size: 0x8, addend: 0x0, symName: _queues, symBinAddr: 0x100008250, symSize: 0x0 }
+  - { offsetInCU: 0x17D, offset: 0x17D, size: 0x8, addend: 0x0, symName: _blockedResources, symBinAddr: 0x1000081E8, symSize: 0x0 }
+  - { offsetInCU: 0x1A4, offset: 0x1A4, size: 0x8, addend: 0x0, symName: _mutexes, symBinAddr: 0x100008248, symSize: 0x0 }
+  - { offsetInCU: 0x1BA, offset: 0x1BA, size: 0x8, addend: 0x0, symName: _printMemory, symObjAddr: 0x0, symBinAddr: 0x100001C5C, symSize: 0x84 }
+  - { offsetInCU: 0x1EC, offset: 0x1EC, size: 0x8, addend: 0x0, symName: _dequeue, symObjAddr: 0x84, symBinAddr: 0x100001CE0, symSize: 0x1D8 }
+  - { offsetInCU: 0x264, offset: 0x264, size: 0x8, addend: 0x0, symName: _findVariable, symObjAddr: 0x25C, symBinAddr: 0x100001EB8, symSize: 0x174 }
+  - { offsetInCU: 0x2D2, offset: 0x2D2, size: 0x8, addend: 0x0, symName: _whichResource, symObjAddr: 0x3D0, symBinAddr: 0x10000202C, symSize: 0xB4 }
+  - { offsetInCU: 0x2FA, offset: 0x2FA, size: 0x8, addend: 0x0, symName: _removeIfDone, symObjAddr: 0x484, symBinAddr: 0x1000020E0, symSize: 0xB0 }
+  - { offsetInCU: 0x33E, offset: 0x33E, size: 0x8, addend: 0x0, symName: _enqueue, symObjAddr: 0x534, symBinAddr: 0x100002190, symSize: 0x84 }
+  - { offsetInCU: 0x370, offset: 0x370, size: 0x8, addend: 0x0, symName: _degradePriority, symObjAddr: 0x5B8, symBinAddr: 0x100002214, symSize: 0xF4 }
+  - { offsetInCU: 0x3B0, offset: 0x3B0, size: 0x8, addend: 0x0, symName: _whichBlocking, symObjAddr: 0x6AC, symBinAddr: 0x100002308, symSize: 0xC4 }
+  - { offsetInCU: 0x3F4, offset: 0x3F4, size: 0x8, addend: 0x0, symName: _incrementPC, symObjAddr: 0x770, symBinAddr: 0x1000023CC, symSize: 0xC8 }
+  - { offsetInCU: 0x434, offset: 0x434, size: 0x8, addend: 0x0, symName: _enqueueBlocked, symObjAddr: 0x838, symBinAddr: 0x100002494, symSize: 0x5C }
+  - { offsetInCU: 0x466, offset: 0x466, size: 0x8, addend: 0x0, symName: _enqueueBlockedResource, symObjAddr: 0x894, symBinAddr: 0x1000024F0, symSize: 0x80 }
+  - { offsetInCU: 0x4A6, offset: 0x4A6, size: 0x8, addend: 0x0, symName: _dequeueHighestBlockedPriorityOfResource, symObjAddr: 0x914, symBinAddr: 0x100002570, symSize: 0x2A4 }
+  - { offsetInCU: 0x55A, offset: 0x55A, size: 0x8, addend: 0x0, symName: _dequeueBlocked, symObjAddr: 0xBB8, symBinAddr: 0x100002814, symSize: 0x154 }
+  - { offsetInCU: 0x5D2, offset: 0x5D2, size: 0x8, addend: 0x0, symName: _flipMutex, symObjAddr: 0xD0C, symBinAddr: 0x100002968, symSize: 0x3C }
+  - { offsetInCU: 0x5F6, offset: 0x5F6, size: 0x8, addend: 0x0, symName: _printQueue, symObjAddr: 0xD48, symBinAddr: 0x1000029A4, symSize: 0xD4 }
+  - { offsetInCU: 0x636, offset: 0x636, size: 0x8, addend: 0x0, symName: _createPCBattr, symObjAddr: 0xE1C, symBinAddr: 0x100002A78, symSize: 0xE0 }
+  - { offsetInCU: 0x688, offset: 0x688, size: 0x8, addend: 0x0, symName: _readFile, symObjAddr: 0xEFC, symBinAddr: 0x100002B58, symSize: 0x1DC }
+  - { offsetInCU: 0x730, offset: 0x730, size: 0x8, addend: 0x0, symName: _assign, symObjAddr: 0x10D8, symBinAddr: 0x100002D34, symSize: 0x208 }
+  - { offsetInCU: 0x81A, offset: 0x81A, size: 0x8, addend: 0x0, symName: _print, symObjAddr: 0x12E0, symBinAddr: 0x100002F3C, symSize: 0xBC }
+  - { offsetInCU: 0x876, offset: 0x876, size: 0x8, addend: 0x0, symName: _writeFile, symObjAddr: 0x139C, symBinAddr: 0x100002FF8, symSize: 0xDC }
+  - { offsetInCU: 0x8E0, offset: 0x8E0, size: 0x8, addend: 0x0, symName: _printFromTo, symObjAddr: 0x1478, symBinAddr: 0x1000030D4, symSize: 0x188 }
+  - { offsetInCU: 0x974, offset: 0x974, size: 0x8, addend: 0x0, symName: _executeInstruction, symObjAddr: 0x1600, symBinAddr: 0x10000325C, symSize: 0x108 }
+  - { offsetInCU: 0x9B4, offset: 0x9B4, size: 0x8, addend: 0x0, symName: _read, symObjAddr: 0x1708, symBinAddr: 0x100003364, symSize: 0x2CC }
+  - { offsetInCU: 0xA33, offset: 0xA33, size: 0x8, addend: 0x0, symName: _getHighestPriorityUnblocked, symObjAddr: 0x19D4, symBinAddr: 0x100003630, symSize: 0xE8 }
+  - { offsetInCU: 0xAAF, offset: 0xAAF, size: 0x8, addend: 0x0, symName: _execute, symObjAddr: 0x1ABC, symBinAddr: 0x100003718, symSize: 0x23C }
+  - { offsetInCU: 0xB5F, offset: 0xB5F, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x1CF8, symBinAddr: 0x100003954, symSize: 0x250 }
 ...

@@ -5,6 +5,7 @@
 #include "utils.c"
 #include "operations.c"
 
+int linear = 0;
 
 PCB* read(char* filename){
     FILE *file = fopen(filename, "r");
@@ -77,16 +78,19 @@ PCB* getHighestPriorityUnblocked(int* quantum){
 void execute(){
     int quantum;
     PCB* currentProcess=getHighestPriorityUnblocked(&quantum);
-
+    if (!linear)
+        quantum = 1 << (quantum-1);
     if (currentProcess==NULL)
         return;
-    printf("Executing Process: %d\n", currentProcess->PID);
     int lowerBound=currentProcess->memoryBoundaries[0];
     int removed = 0;
     for (int i = 0; i < quantum; i++)
     {
         word *instruction = Memory[currentProcess->pc + currentProcess->memoryBoundaries[0] + 9];
+        printf("Executing Process(quantum left=%d): %d\n", quantum-i,currentProcess->PID);
+
         printf("Executing Instruction: %s\n", instruction->value);
+
         int blocking = whichBlocking(instruction);
         if (blocking != 0)
         {
@@ -98,28 +102,41 @@ void execute(){
                 {
                     enqueue(dequeud);        // enqueue the dequeued PCB to the ready queue
                     dequeueBlocked(dequeud); // dequeue the PCB from the general blocked queue and set its state to ready i.e 0
+                    printf("Unblocking Process: %d\n", dequeud->PID);
+                    printf("Process %d is now using resource %d\n", dequeud->PID, -blocking);
                 }
             }
             else
-            {                                // semWait
-                if (!mutexes[blocking - 1])  // mutex is available
+            { // semWait
+                if (!mutexes[blocking - 1]){  // mutex is available
                     flipMutex(blocking - 1); // lock the mutex
+                    printf("Process %d is now using resource %d\n", currentProcess->PID, blocking);
+                }
                 else
                 { // mutex is not available
+                    printf("Blocking Process because resource not available: %d\n", currentProcess->PID);
+                    currentProcess->state = 1;
                     enqueueBlocked(currentProcess);
                     enqueueBlockedResource(currentProcess, blocking - 1);
                     dequeue(currentProcess);
-                    currentProcess->state = 1;
                 }
             }
         }
         else
             executeInstruction(currentProcess, instruction);
 
+
+
+
         incrementPC(currentProcess);
-        removed=removeIfDone(currentProcess);
-        if (removed)
+        if (removeIfDone(currentProcess))
+        {
+            removed = 1;
+            printf("Process %d is done\n", currentProcess->PID);
             break;
+        }
+
+
     }
     if (!removed)
         degradePriority(currentProcess);
@@ -142,6 +159,16 @@ int main()
     printf("Enter arrival time for %s: ","process 3" );
     scanf("%s", input);
     arrivals[2] = atoi(input);
+
+    printf("Enter 1 for linear execution, 0 for quantum execution(exponential): ");
+    scanf("%d", &linear);
+
+    printf("==============================================\n");
+    printf("Note: Resources are hashed according to the following:\n");
+    printf("1->file resource \n");
+    printf("2->userInput resource \n");
+    printf("3->userOutput resource \n");
+    printf("==============================================\n");
 
     for (int clock = 0; clock < 1e3; clock++)
     {
@@ -170,70 +197,5 @@ int main()
         execute();
     }
 
-    // PCB *process = (PCB *)malloc(sizeof(PCB));
-    // process = read("Program_1.txt");
-    // enqueue(process);
-    // process = read("Program_2.txt");
-    // enqueue(process);
-    // process = read("Program_3.txt");
-    // enqueue(process);
-
-
-    // for (int i = 0; i < 60; i++)
-    // {
-    //     if (Memory[i] != NULL)
-    //         printMemory(i);
-    //     else
-    //         printf("%d- NULL\n", i);
-    // }
-
-
     return 0;
 }
-
-
-
-
-
-
-//
-// [_,_,_,_,_]   ->Memory
-
-// reading program 1
-// [semWait userInput,assign a input ,.....] -> program 1
-//   1                     2           3
-// [PCB1] -> PCBMemory
-// [[PCB1],[],[],[]] -> queues
-//  1 2 3 4
-
-// execute line 1 of program 1
-// [[],[PCB1],[],[]] -> queues
-// [semWait userInput,assign a input ,.....] -> program 2
-//   12                    13          14
-// [PCB1,PCB2] -> PCBMemory
-
-
-
-// reading the program
-    // inserting into the memory
-    // creating a PCB instance
-    // inserting the PCB instance into the PCBMEMORY
-    // inserting the PCB instance into the queues
-
-
-// executing the program
-    // pick the highest priority PCB from queues
-    // execute the next instruction based on the current quantum
-    // if the instruction is a system call(read input,open file,outputing),
-        // if the resource is available, execute the instruction and set the mutex respectively
-        // if the resource is not available, block the PCB by enqueuing it to the generalBlockedQueue and the respective blockedQueue of the resource
-    // finally push the PCB to the next lower quantum
-
-
-
-
-
-
-
-
-//

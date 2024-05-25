@@ -7,6 +7,6 @@ void ad(int a, int b)
 
 int main()
 {
-    void (*operations[3])(int, int) = {ad};
+    printf("%d \n",1<<0);
     return 0;
 }

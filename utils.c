@@ -4,6 +4,23 @@
 #include <string.h>
 #include <stdlib.h>
 
+int comp(const void *elem1, const void *elem2)
+{
+    PCB *f = ((PCB *)elem1);
+    PCB *s = ((PCB *)elem2);
+    if (f->priority > s->priority)
+        return 1;
+    if (f->priority < s->priority)
+        return -1;
+    return 0;
+}
+int sort(PCB *arr[])
+{
+    qsort(arr, sizeof(arr) / sizeof(PCB), sizeof(PCB), comp);
+
+    return 0;
+}
+
 void printMemory(int i){
     printf("%d- ", i);
     word *word = Memory[i];
@@ -13,10 +30,16 @@ void printMemory(int i){
 void dequeue(PCB* pcb){
     for (int i = 0; i < 3; i++)
         if (queues[pcb->priority][i] !=NULL&& queues[pcb->priority][i]->PID == pcb->PID)
-        {
             queues[pcb->priority][i] = NULL;
+    // shift forward
+    for (int i = 0; i < 3; i++)
+        if (queues[pcb->priority][i] == NULL){
+            for (int j = i+1; j < 3; j++)
+                queues[pcb->priority][j-1] = queues[pcb->priority][j];
+            queues[pcb->priority][2] = NULL;
             return;
         }
+    sort(queues[pcb->priority]);
 }
 
 int findVariable(PCB* pcb, char* varName){
@@ -24,8 +47,6 @@ int findVariable(PCB* pcb, char* varName){
         if (Memory[i] != NULL && strcmp(Memory[i]->name, varName) == 0)
             return i;
         }
-    printf("NOT found variable with name %s\n", varName);
-
 
     for (int i = pcb->memoryBoundaries[0]+6; i < pcb->memoryBoundaries[0]+10; i++)
         if (Memory[i]==NULL)
@@ -34,7 +55,7 @@ int findVariable(PCB* pcb, char* varName){
     return -100;
 }
 
-int whichResource(char* resource){
+int hashResource(char* resource){
     if (strcmp(resource,"file")==0)
         return 1;
     else if (strcmp(resource,"userInput")==0)
@@ -45,15 +66,13 @@ int whichResource(char* resource){
 }
 
 
+
 int removeIfDone(PCB* pcb){
     if ((pcb->pc+9+pcb->memoryBoundaries[0]) >= pcb->memoryBoundaries[1]){
         for (int i = pcb->memoryBoundaries[0]; i < pcb->memoryBoundaries[1]; i++)
             Memory[i] = NULL;
-        for (int i = 0; i < 3; i++)
-            if (queues[pcb->priority][i] != NULL && queues[pcb->priority][i]->PID == pcb->PID){
-                queues[pcb->priority][i] = NULL;
-                return 1;
-            }
+        dequeue(pcb);
+        return 1;
     }
     return 0;
 }
@@ -63,6 +82,7 @@ void enqueue(PCB* pcb){
     while (queues[pcb->priority][i] != NULL)
         i++;
     queues[pcb->priority][i] = pcb;
+    sort(queues[pcb->priority]);
 }
 
 void degradePriority(PCB* pcb){
@@ -73,6 +93,7 @@ void degradePriority(PCB* pcb){
         snprintf(buf, 10, "%d", pcb->priority);
         Memory[findVariable(pcb, "Priority")]->value = strdup(buf);
         enqueue(pcb);
+        sort(queues[pcb->priority]);
     }
 }
 
@@ -80,9 +101,9 @@ int whichBlocking(word* instruction){
     char* operation=strtok(strdup(instruction->value), " ");
     char* resource=strtok(NULL, " ");
     if (strcmp(operation,"semWait")==0)
-        return whichResource(resource);
+        return hashResource(resource);
     else if (strcmp(operation,"semSignal")==0)
-        return -whichResource(resource);
+        return -hashResource(resource);
     return 0;
 }
 
@@ -102,12 +123,14 @@ void enqueueBlocked(PCB* pcb){
     while (generalBlockedQueue[i] != NULL)
         i++;
     generalBlockedQueue[i] = pcb;
+    sort(generalBlockedQueue);
 }
 void enqueueBlockedResource(PCB* pcb, int resource){
     int i = 0;
     while (blockedResources[resource][i] != NULL)
         i++;
     blockedResources[resource][i] = pcb;
+    sort(blockedResources[resource]);
 }
 
 
@@ -122,6 +145,23 @@ PCB* dequeueHighestBlockedPriorityOfResource(int resource){
                 currentPriority = highestPriorityPCB->priority;
             }
         }
+
+    // remove the highest priority PCB from the blocked queue
+    for (int i = 0; i < 3; i++)
+        if (blockedResources[resource][i] != NULL  &&  (blockedResources[resource][i]->PID) == (highestPriorityPCB->PID))
+            blockedResources[resource][i] = NULL;
+
+
+    // shift forward
+    for (int i = 0; i < 3; i++)
+        if (blockedResources[resource][i] == NULL){
+            for (int j = i+1; j < 3; j++)
+                blockedResources[resource][j-1] = blockedResources[resource][j];
+            blockedResources[resource][2] = NULL;
+            return highestPriorityPCB;
+        }
+
+
     return highestPriorityPCB;
 }
 
@@ -130,8 +170,17 @@ void dequeueBlocked(PCB* pcb){
         if (generalBlockedQueue[i]!=NULL  &&  (generalBlockedQueue[i]->PID) == (pcb->PID)){
             generalBlockedQueue[i] = NULL;
             pcb->state = 0;
+        }
+
+    // shift forward
+    for (int i = 0; i < 3; i++)
+        if (generalBlockedQueue[i] == NULL){
+            for (int j = i+1; j < 3; j++)
+                generalBlockedQueue[j-1] = generalBlockedQueue[j];
+            generalBlockedQueue[2] = NULL;
             return;
         }
+    sort(generalBlockedQueue);
 }
 
 
